@@ -11,6 +11,10 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <p>
@@ -39,6 +43,7 @@ public class CPainting extends Canvas implements MouseListener {
   static private float[][] mMatriceConv49 = new float[7][7];
   // Objet de type Graphics permettant de manipuler l'affichage du Canvas
   private Graphics mGraphics;
+  private Graphics imageGraphics;
   // Objet ne servant que pour les bloc synchronized pour la manipulation du
   // tableau des couleurs
   private Object mMutexCouleurs = new Object();
@@ -55,6 +60,10 @@ public class CPainting extends Canvas implements MouseListener {
   private PaintingAnts mApplis;
 
   private boolean mSuspendu = false;
+  
+  private long lastDrawTime;
+  
+  private BufferedImage bufferedImage;
 
   /******************************************************************************
    * Titre : public CPainting() Description : Constructeur de la classe
@@ -69,6 +78,9 @@ public class CPainting extends Canvas implements MouseListener {
     setBounds(new Rectangle(0, 0, mDimension.width, mDimension.height));
 
     this.setBackground(mCouleurFond);
+    
+    bufferedImage = new BufferedImage(mDimension.width,mDimension.height,BufferedImage.TYPE_INT_RGB);
+    imageGraphics = bufferedImage.getGraphics();
 
     // initialisation de la matrice des couleurs
     mCouleurs = new Color[mDimension.width][mDimension.height];
@@ -76,6 +88,8 @@ public class CPainting extends Canvas implements MouseListener {
       for (i = 0; i != mDimension.width; i++) {
         for (j = 0; j != mDimension.height; j++) {
           mCouleurs[i][j] = new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue());
+          imageGraphics.setColor(mCouleurs[i][j]);
+          imageGraphics.fillRect(i, j, 1, 1);
         }
       }
     }
@@ -89,6 +103,8 @@ public class CPainting extends Canvas implements MouseListener {
     		}
     	}
     }
+    
+    lastDrawTime = System.currentTimeMillis();
   }
 
   /******************************************************************************
@@ -301,16 +317,7 @@ public class CPainting extends Canvas implements MouseListener {
    ******************************************************************************/
   @Override
   public void paint(Graphics pGraphics) {
-    int i, j;
-
-    synchronized (mMutexCouleurs) {
-      for (i = 0; i < mDimension.width; i++) {
-        for (j = 0; j < mDimension.height; j++) {
-          pGraphics.setColor(mCouleurs[i][j]);
-          pGraphics.fillRect(i, j, 1, 1);
-        }
-      }
-    }
+	mGraphics.drawImage(bufferedImage, 0, 0, mDimension.width, mDimension.height,this);
   }
 
   /******************************************************************************
@@ -320,14 +327,25 @@ public class CPainting extends Canvas implements MouseListener {
    ******************************************************************************/
   public void setCouleur(int x, int y, Color c, int pTaille) {
     int i, j, k, l, m, n;
-    float R, G, B, coef;
+    //float R, G, B, coef;
+    AtomicInteger R,G,B;
+    R = new AtomicInteger(0);
+    G = new AtomicInteger(0);
+    B = new AtomicInteger(0);
     Color lColor, couleur;
 
+    long currentDrawTime = System.currentTimeMillis();
+    long millisDifference = currentDrawTime - lastDrawTime;
+    if(millisDifference > 32) {
+    	mGraphics.drawImage(bufferedImage, 0, 0, mDimension.width, mDimension.height,this);
+    	lastDrawTime = currentDrawTime;
+    }
+    
     synchronized (mMutexCouleurs) {
       if (!mSuspendu) {
         // on colorie la case sur laquelle se trouve la fourmi
-        mGraphics.setColor(c);
-        mGraphics.fillRect(x, y, 1, 1);
+        imageGraphics.setColor(c);
+        imageGraphics.fillRect(x, y, 1, 1);
       }
 
       mCouleurs[x][y] = c;
@@ -341,29 +359,21 @@ public class CPainting extends Canvas implements MouseListener {
           // produit de convolution discrete sur 9 cases
           for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
-              R = G = B = 0f;
+              R.set(0);
+              G.set(0);
+              B.set(0);
 
-              for (k = 0; k < 3; k++) {
-                for (l = 0; l < 3; l++) {
-                  m = (x + i + k - 2 + mDimension.width) % mDimension.width;
-                  n = (y + j + l - 2 + mDimension.height) % mDimension.height;
-                  coef = CPainting.mMatriceConv9[k][l];
-                  couleur = mCouleurs[m][n];
-                  
-                  R += coef * couleur.getRed();
-                  G += coef * couleur.getGreen();
-                  B += coef * couleur.getBlue();
-                }
-              }
-              lColor = mTableauCouleursCache[(int)R][(int)G][(int)B];//new Color((int) R, (int) G, (int) B);
+              convoluer(R,G,B,i,j,x,y,3);
+              
+              lColor = mTableauCouleursCache[R.get()][G.get()][B.get()];//new Color((int) R, (int) G, (int) B);
 
-              mGraphics.setColor(lColor);
+              imageGraphics.setColor(lColor);
 
               m = (x + i - 1 + mDimension.width) % mDimension.width;
               n = (y + j - 1 + mDimension.height) % mDimension.height;
               mCouleurs[m][n] = lColor;
               if (!mSuspendu) {
-                mGraphics.fillRect(m, n, 1, 1);
+            	  imageGraphics.fillRect(m, n, 1, 1);
               }
             }
           }
@@ -372,31 +382,21 @@ public class CPainting extends Canvas implements MouseListener {
           // produit de convolution discrete sur 25 cases
           for (i = 0; i < 5; i++) {
             for (j = 0; j < 5; j++) {
-              R = G = B = 0f;
+              //R = G = B = 0;
+                R.set(0);
+                G.set(0);
+                B.set(0);
 
-              for (k = 0; k < 5; k++) {
-                for (l = 0; l < 5; l++) {
-                  m = (x + i + k - 4 + mDimension.width) % mDimension.width;
-                  n = (y + j + l - 4 + mDimension.height) % mDimension.height;
-                  /*R += CPainting.mMatriceConv25[k][l] * mCouleurs[m][n].getRed();
-                  G += CPainting.mMatriceConv25[k][l] * mCouleurs[m][n].getGreen();
-                  B += CPainting.mMatriceConv25[k][l] * mCouleurs[m][n].getBlue();*/
-                  coef = CPainting.mMatriceConv25[k][l];
-                  couleur = mCouleurs[m][n];
-                  
-                  R += coef * couleur.getRed();
-                  G += coef * couleur.getGreen();
-                  B += coef * couleur.getBlue();
-                }
-              }
-              lColor = mTableauCouleursCache[(int)R][(int)G][(int)B];//new Color((int) R, (int) G, (int) B);
-              mGraphics.setColor(lColor);
+              convoluer(R,G,B,i,j,x,y,5);
+              
+              lColor = mTableauCouleursCache[R.get()][G.get()][B.get()];//new Color((int) R, (int) G, (int) B);
+              imageGraphics.setColor(lColor);
               m = (x + i - 2 + mDimension.width) % mDimension.width;
               n = (y + j - 2 + mDimension.height) % mDimension.height;
 
               mCouleurs[m][n] = lColor;
               if (!mSuspendu) {
-                mGraphics.fillRect(m, n, 1, 1);
+            	 imageGraphics.fillRect(m, n, 1, 1);
               }
 
             }
@@ -406,40 +406,65 @@ public class CPainting extends Canvas implements MouseListener {
           // produit de convolution discrete sur 49 cases
           for (i = 0; i < 7; i++) {
             for (j = 0; j < 7; j++) {
-              R = G = B = 0f;
+              //R = G = B = 0;
+                R.set(0);
+                G.set(0);
+                B.set(0);
 
-              for (k = 0; k < 7; k++) {
-                for (l = 0; l < 7; l++) {
-                  m = (x + i + k - 6 + mDimension.width) % mDimension.width;
-                  n = (y + j + l - 6 + mDimension.height) % mDimension.height;
-                  /*R += CPainting.mMatriceConv49[k][l] * mCouleurs[m][n].getRed();
-                  G += CPainting.mMatriceConv49[k][l] * mCouleurs[m][n].getGreen();
-                  B += CPainting.mMatriceConv49[k][l] * mCouleurs[m][n].getBlue();*/
-                  coef = CPainting.mMatriceConv49[k][l];
-                  couleur = mCouleurs[m][n];
-                  
-                  R += coef * couleur.getRed();
-                  G += coef * couleur.getGreen();
-                  B += coef * couleur.getBlue();
-                }
-              }
-              lColor = mTableauCouleursCache[(int)R][(int)G][(int)B];//new Color((int) R, (int) G, (int) B);
-              mGraphics.setColor(lColor);
+              convoluer(R,G,B,i,j,x,y,7);
+
+              lColor = mTableauCouleursCache[R.get()][G.get()][B.get()];//new Color((int) R, (int) G, (int) B);
+              imageGraphics.setColor(lColor);
               m = (x + i - 3 + mDimension.width) % mDimension.width;
               n = (y + j - 3 + mDimension.height) % mDimension.height;
 
               mCouleurs[m][n] = lColor;
               if (!mSuspendu) {
-                mGraphics.fillRect(m, n, 1, 1);
+            	imageGraphics.fillRect(m, n, 1, 1);
               }
 
             }
           }
           break;
       }// end switch
+      
     }
   }
 
+  
+  public void convoluer(AtomicInteger R, AtomicInteger G, AtomicInteger B, int i, int j, int x, int y, int size) {
+	  float r,g,b;
+	  r = g = b = 0;
+	  for (int k = 0; k < size; k++) {
+          for (int l = 0; l < size; l++) {
+            int m = (x + i + k - (size-1) + mDimension.width) % mDimension.width;
+            int n = (y + j + l - (size-1) + mDimension.height) % mDimension.height;
+            /*R += CPainting.mMatriceConv49[k][l] * mCouleurs[m][n].getRed();
+            G += CPainting.mMatriceConv49[k][l] * mCouleurs[m][n].getGreen();
+            B += CPainting.mMatriceConv49[k][l] * mCouleurs[m][n].getBlue();*/
+            float coef = 0;
+            switch(size) {
+            case 7:
+            	coef = CPainting.mMatriceConv49[k][l];
+            	break;
+            case 5:
+            	coef = CPainting.mMatriceConv25[k][l];
+            	break;
+            case 3:
+            	coef = CPainting.mMatriceConv9[k][l];
+            	break;
+            }
+            Color couleur = mCouleurs[m][n];
+            
+            r += coef * couleur.getRed();
+            g += coef * couleur.getGreen();
+            b += coef * couleur.getBlue();
+          }
+        }
+	  R.set((int)r);
+	  G.set((int)g);
+	  B.set((int)b);
+  }
   /******************************************************************************
    * Titre : setSupendu Description : Cette fonction change l'état de suspension
    ******************************************************************************/

@@ -43,7 +43,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
   /****************************************************************************/
   /**
-   * incrémenter le compteur
+   * incrementer le compteur
    *
    */
   public void compteur() {
@@ -54,7 +54,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
   /****************************************************************************/
   /**
-   * Détruire l'applet
+   * Detruire l'applet
    *
    */
   @Override
@@ -86,13 +86,13 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
   public String[][] getParameterInfo() {
     String[][] lInfo = { { "SeuilLuminance", "string", "Seuil de luminance" }, { "Img", "string", "Image" },
         { "NbFourmis", "string", "Nombre de fourmis" }, { "Fourmis", "string",
-            "Paramètres des fourmis (RGB_déposée)(RGB_suivie)(x,y,direction,taille)(TypeDeplacement,ProbaG,ProbaTD,ProbaD,ProbaSuivre);...;" } };
+            "Paramètres des fourmis (RGB_deposee)(RGB_suivie)(x,y,direction,taille)(TypeDeplacement,ProbaG,ProbaTD,ProbaD,ProbaSuivre);...;" } };
     return lInfo;
   }
 
   /****************************************************************************/
   /**
-   * Obtenir l'état de pause
+   * Obtenir l'etat de pause
    *
    */
   public boolean getPause() {
@@ -178,9 +178,9 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
   // =========================================================================
   // cette fonction analyse une chaine :
-  // si pStr est un nombre : sa valeur est retournée
+  // si pStr est un nombre : sa valeur est retournee
   // si pStr est un interval x..y : une valeur au hasard dans [x,y] est
-  // retournée
+  // retournee
   private float readFloatParameter(String pStr) {
     float lMin, lMax, lResult;
     // System.out.println(" chaine pStr: "+pStr);
@@ -198,7 +198,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
         lResult = (float) (Math.random() * (lMax - lMin)) + lMin;
       }
     } catch (java.util.NoSuchElementException e) {
-      // il n'y pas de deuxieme nombre et donc le nombre retourné correspond au
+      // il n'y pas de deuxieme nombre et donc le nombre retourne correspond au
       // premier nombre
     }
     return lResult;
@@ -206,9 +206,9 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
   // =========================================================================
   // cette fonction analyse une chaine :
-  // si pStr est un nombre : sa valeur est retournée
+  // si pStr est un nombre : sa valeur est retournee
   // si pStr est un interval x..y : une valeur au hasard dans [x,y] est
-  // retournée
+  // retournee
   private int readIntParameter(String pStr) {
     int lMin, lMax, lResult;
     StringTokenizer lStrTok = new StringTokenizer(pStr, ":");
@@ -223,7 +223,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
         lResult = (int) (Math.random() * (lMax - lMin + 1)) + lMin;
       }
     } catch (java.util.NoSuchElementException e) {
-      // il n'y pas de deuxieme nombre et donc le nombre retourné correspond au
+      // il n'y pas de deuxieme nombre et donc le nombre retourne correspond au
       // premier nombre
     }
     return lResult;
@@ -251,7 +251,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
     if (lChaine != null) {
       lSeuilLuminance = readFloatParameter(lChaine);
     } else {
-      // si seuil de luminance n'est pas défini
+      // si seuil de luminance n'est pas defini
       lSeuilLuminance = 40f;
     }
     System.out.println("Seuil de luminance:" + lSeuilLuminance);
@@ -263,18 +263,18 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
     if (lChaine != null) {
       lNbFourmis = readIntParameter(lChaine);
     } else {
-      // si le parametre NbFourmis n'est pas défini
+      // si le parametre NbFourmis n'est pas defini
       lNbFourmis = -1;
     }
-    // si le parametre NbFourmis n'est pas défini ou alors s'il vaut -1 :
+    // si le parametre NbFourmis n'est pas defini ou alors s'il vaut -1 :
     if (lNbFourmis == -1) {
-      // Le nombre de fourmis est aléatoire entre 2 et 6 !
+      // Le nombre de fourmis est aleatoire entre 2 et 6 !
       lNbFourmis = (int) (Math.random() * 5) + 2;
     }
 
     // <PARAM NAME="Fourmis"
     // VALUE="(255,0,0)(255,255,255)(20,40,1)([d|o],0.2,0.6,0.2,0.8)">
-    // (R,G,B) de la couleur déposée : -1 = random(0...255); x:y = random(x...y)
+    // (R,G,B) de la couleur deposee : -1 = random(0...255); x:y = random(x...y)
     // (R,G,B) de la couleur suivie : -1 = random(0...255); x:y = random(x...y)
     // (x,y,d,t) position , direction initiale et taille du trait
     // x,y = 0.0 ... 1.0 : -1 = random(0.0 ... 1.0); x:y = random(x...y)
@@ -300,18 +300,18 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
       while (lSTFourmi.hasMoreTokens()) {
         // chaine de parametres de couleur et proba
         StringTokenizer lSTParam = new StringTokenizer(lSTFourmi.nextToken(), "()");
-        // lecture de la couleur déposée
-        StringTokenizer lSTCouleurDéposée = new StringTokenizer(lSTParam.nextToken(), ",");
-        R = readIntParameter(lSTCouleurDéposée.nextToken());
+        // lecture de la couleur deposee
+        StringTokenizer lSTCouleurDeposee = new StringTokenizer(lSTParam.nextToken(), ",");
+        R = readIntParameter(lSTCouleurDeposee.nextToken());
         if (R == -1) {
           R = (int) (Math.random() * 256);
         }
 
-        G = readIntParameter(lSTCouleurDéposée.nextToken());
+        G = readIntParameter(lSTCouleurDeposee.nextToken());
         if (G == -1) {
           G = (int) (Math.random() * 256);
         }
-        B = readIntParameter(lSTCouleurDéposée.nextToken());
+        B = readIntParameter(lSTCouleurDeposee.nextToken());
         if (B == -1) {
           B = (int) (Math.random() * 256);
         }
@@ -326,22 +326,22 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
         lCouleurSuivie = new Color(R, G, B);
         System.out.print("(" + R + "," + G + "," + B + ")");
 
-        // lecture de la position de la direction de départ et de la taille de
+        // lecture de la position de la direction de depart et de la taille de
         // la trace
-        StringTokenizer lSTDéplacement = new StringTokenizer(lSTParam.nextToken(), ",");
-        lInit_x = readFloatParameter(lSTDéplacement.nextToken());
+        StringTokenizer lSTDeplacement = new StringTokenizer(lSTParam.nextToken(), ",");
+        lInit_x = readFloatParameter(lSTDeplacement.nextToken());
         if (lInit_x < 0.0 || lInit_x > 1.0) {
           lInit_x = (float) Math.random();
         }
-        lInit_y = readFloatParameter(lSTDéplacement.nextToken());
+        lInit_y = readFloatParameter(lSTDeplacement.nextToken());
         if (lInit_y < 0.0 || lInit_y > 1.0) {
           lInit_y = (float) Math.random();
         }
-        lInitDirection = readIntParameter(lSTDéplacement.nextToken());
+        lInitDirection = readIntParameter(lSTDeplacement.nextToken());
         if (lInitDirection < 0 || lInitDirection > 7) {
           lInitDirection = (int) (Math.random() * 8);
         }
-        lTaille = readIntParameter(lSTDéplacement.nextToken());
+        lTaille = readIntParameter(lSTDeplacement.nextToken());
         if (lTaille < 0 || lTaille > 3) {
           lTaille = (int) (Math.random() * 4);
         }
@@ -373,20 +373,20 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
         System.out.println(
             "(" + lTypeDeplacement + "," + lProbaG + "," + lProbaTD + "," + lProbaD + "," + lProbaSuivre + ");");
 
-        // création de la fourmi
+        // creation de la fourmi
         lFourmi = new CFourmi(lCouleurDeposee, lCouleurSuivie, lProbaTD, lProbaG, lProbaD, lProbaSuivre, mPainting,
             lTypeDeplacement, lInit_x, lInit_y, lInitDirection, lTaille, lSeuilLuminance, this);
         mColonie.addElement(lFourmi);
         lNbFourmis++;
       }
-    } else // initialisation aléatoire des fourmis
+    } else // initialisation aleatoire des fourmis
     {
 
       int i;
       Color lTabColor[] = new Color[lNbFourmis];
       int lColor;
 
-      // initialisation aléatoire de la couleur de chaque fourmi
+      // initialisation aleatoire de la couleur de chaque fourmi
       for (i = 0; i < lNbFourmis; i++) {
         R = (int) (Math.random() * 256);
         G = (int) (Math.random() * 256);
@@ -402,7 +402,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
           lColor = (lColor + 1) % lNbFourmis;
         }
 
-        // une chance sur deux d'avoir un déplacement perpendiculaire
+        // une chance sur deux d'avoir un deplacement perpendiculaire
         if ((float) Math.random() < 0.5f) {
           lTypeDeplacement = 'd';
         } else {
@@ -419,7 +419,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
         // taille du trait
         lTaille = (int) (Math.random() * 4);
 
-        // proba de déplacement :
+        // proba de deplacement :
         lProbaTD = (float) (Math.random());
         lProbaG = (float) (Math.random() * (1.0 - lProbaTD));
         lProbaD = (float) (1.0 - (lProbaTD + lProbaG));
@@ -433,7 +433,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
         System.out.println(
             "(" + lTypeDeplacement + "," + lProbaG + "," + lProbaTD + "," + lProbaD + "," + lProbaSuivre + ");");
 
-        // création et ajout de la fourmi dans la colonie
+        // creation et ajout de la fourmi dans la colonie
         lFourmi = new CFourmi(lTabColor[i], lTabColor[lColor], lProbaTD, lProbaG, lProbaD, lProbaSuivre, mPainting,
             lTypeDeplacement, lInit_x, lInit_y, lInitDirection, lTaille, lSeuilLuminance, this);
         mColonie.addElement(lFourmi);
@@ -444,7 +444,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
   }
 
   /*************************************************************************************************
-   * Titre : boolean testCouleur() Description : fonction testant l'égalité de
+   * Titre : boolean testCouleur() Description : fonction testant l'egalite de
    * deux couleurs
    *
    */

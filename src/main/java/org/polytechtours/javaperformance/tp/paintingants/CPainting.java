@@ -1,6 +1,7 @@
 package org.polytechtours.javaperformance.tp.paintingants;
 // package PaintingAnts_v2;
 
+import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,7 +9,11 @@ import java.awt.Dimension;
 // version : 2.0
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -336,7 +341,8 @@ public class CPainting extends Canvas implements MouseListener {
 
     long currentDrawTime = System.currentTimeMillis();
     long millisDifference = currentDrawTime - lastDrawTime;
-    if(millisDifference > 32) {
+    if(millisDifference > 16) {
+    	//mGraphics.drawImage(bufferedImage, 0, 0, mDimension.width, mDimension.height,this);
     	mGraphics.drawImage(bufferedImage, 0, 0, mDimension.width, mDimension.height,this);
     	lastDrawTime = currentDrawTime;
     }

@@ -313,15 +313,15 @@ public class CPainting extends Canvas implements MouseListener {
     float R, G, B;
     Color lColor;
 
-    synchronized (mMutexCouleurs) {
-      if (!mSuspendu) {
+    //synchronized (mMutexCouleurs) {
+    //  if (!mSuspendu) {
         // on colorie la case sur laquelle se trouve la fourmi
         mGraphics.setColor(c);
         mGraphics.fillRect(x, y, 1, 1);
-      }
+      //}
 
       mCouleurs[x][y] = c;
-
+      
       // on fait diffuser la couleur :
       switch (pTaille) {
         case 0:
@@ -413,7 +413,7 @@ public class CPainting extends Canvas implements MouseListener {
           break;
       }// end switch
     }
-  }
+  //}
 
   /******************************************************************************
    * Titre : setSupendu Description : Cette fonction change l'état de suspension

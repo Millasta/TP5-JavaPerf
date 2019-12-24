@@ -11,25 +11,40 @@ package org.polytechtours.javaperformance.tp.paintingants;
  */
 import java.util.Vector;
 
-public class CColonie implements Runnable {
+public class CColonie {
 
   private Boolean mContinue = Boolean.TRUE;
   private Vector<CFourmi> mColonie;
+  private Vector<Thread> mThreadsColonie;
   private PaintingAnts mApplis;
 
   /** Creates a new instance of CColonie */
   public CColonie(Vector<CFourmi> pColonie, PaintingAnts pApplis) {
     mColonie = pColonie;
     mApplis = pApplis;
+    mThreadsColonie = new Vector<Thread>();
   }
 
   public void pleaseStop() {
-    mContinue = false;
+	  for (int i = 0; i < mThreadsColonie.size(); i++) {
+		  mColonie.get(i).pleaseStop();
+		  try {
+		      mThreadsColonie.get(i).join();
+		    } catch (Exception e) {
+		    }
+	  }
   }
 
-  @Override
+  public void start() {
+	  for (int i = 0; i < mColonie.size(); i++) {
+		  Thread newThread = new Thread(mColonie.get(i));
+		  newThread.start();
+		  mThreadsColonie.add(newThread);
+	  }
+  }
+  
+  /*@Override
   public void run() {
-
     while (mContinue == true) {
       if (!mApplis.getPause()) {
         for (int i = 0; i < mColonie.size(); i++) {
@@ -39,10 +54,9 @@ public class CColonie implements Runnable {
       } else {
         /*
          * try { Thread.sleep(100); } catch (InterruptedException e) { break; }
-         */
-
+         
       }
     }
-  }
+  }*/
 
 }

@@ -371,9 +371,6 @@ public class CPainting extends Canvas implements MouseListener {
           // produit de convolution discrete sur 9 cases
           for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
-              R.set(0);
-              G.set(0);
-              B.set(0);
 
               convoluer(R,G,B,i,j,x,y,3);
               
@@ -394,10 +391,6 @@ public class CPainting extends Canvas implements MouseListener {
           // produit de convolution discrete sur 25 cases
           for (i = 0; i < 5; i++) {
             for (j = 0; j < 5; j++) {
-              //R = G = B = 0;
-                R.set(0);
-                G.set(0);
-                B.set(0);
 
               convoluer(R,G,B,i,j,x,y,5);
               
@@ -418,11 +411,7 @@ public class CPainting extends Canvas implements MouseListener {
           // produit de convolution discrete sur 49 cases
           for (i = 0; i < 7; i++) {
             for (j = 0; j < 7; j++) {
-              //R = G = B = 0;
-                R.set(0);
-                G.set(0);
-                B.set(0);
-
+            	
               convoluer(R,G,B,i,j,x,y,7);
 
               lColor = mTableauCouleursCache[R.get()][G.get()][B.get()];//new Color((int) R, (int) G, (int) B);
@@ -447,6 +436,7 @@ public class CPainting extends Canvas implements MouseListener {
   public void convoluer(AtomicInteger R, AtomicInteger G, AtomicInteger B, int i, int j, int x, int y, int size) {
 	  float r,g,b;
 	  r = g = b = 0;
+	  Color couleur;
 	  for (int k = 0; k < size; k++) {
           for (int l = 0; l < size; l++) {
             int m = (x + i + k - (size-1) + mDimension.width) % mDimension.width;
@@ -466,7 +456,7 @@ public class CPainting extends Canvas implements MouseListener {
             	coef = CPainting.mMatriceConv9[k][l];
             	break;
             }
-            Color couleur = mCouleurs[m][n];
+            couleur = mCouleurs[m][n];
             
             r += coef * couleur.getRed();
             g += coef * couleur.getGreen();

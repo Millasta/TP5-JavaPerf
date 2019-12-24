@@ -33,6 +33,8 @@ public class CFourmi {
   private float mSeuilLuminance;
   // nombre de déplacements de la fourmi
   private long mNbDeplacements;
+  
+  private int[] dir;
 
   /*************************************************************************************************
   */
@@ -86,6 +88,8 @@ public class CFourmi {
 
     mSeuilLuminance = pSeuilLuminance;
     mNbDeplacements = 0;
+    
+    dir = new int[3];
   }
 
   /*************************************************************************************************
@@ -94,7 +98,7 @@ public class CFourmi {
    */
   public synchronized void deplacer() {
     float tirage, prob1, prob2, prob3, total;
-    int[] dir = new int[3];
+    
     int i, j;
     Color lCouleur;
 

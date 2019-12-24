@@ -69,7 +69,9 @@ public class CPainting extends Canvas implements MouseListener {
   private long lastDrawTime;
   
   private BufferedImage bufferedImage;
-
+  
+  private AtomicInteger R,G,B;
+  
   /******************************************************************************
    * Titre : public CPainting() Description : Constructeur de la classe
    ******************************************************************************/
@@ -87,18 +89,6 @@ public class CPainting extends Canvas implements MouseListener {
     bufferedImage = new BufferedImage(mDimension.width,mDimension.height,BufferedImage.TYPE_INT_RGB);
     imageGraphics = bufferedImage.getGraphics();
 
-    // initialisation de la matrice des couleurs
-    mCouleurs = new Color[mDimension.width][mDimension.height];
-    synchronized (mMutexCouleurs) {
-      for (i = 0; i != mDimension.width; i++) {
-        for (j = 0; j != mDimension.height; j++) {
-          mCouleurs[i][j] = new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue());
-          imageGraphics.setColor(mCouleurs[i][j]);
-          imageGraphics.fillRect(i, j, 1, 1);
-        }
-      }
-    }
-    
     // initialisation des couleurs en cache
     mTableauCouleursCache = new Color[256][256][256];
     for(i=0;i<256;i++) {
@@ -108,6 +98,22 @@ public class CPainting extends Canvas implements MouseListener {
     		}
     	}
     }
+    
+    // initialisation de la matrice des couleurs
+    mCouleurs = new Color[mDimension.width][mDimension.height];
+    synchronized (mMutexCouleurs) {
+      for (i = 0; i != mDimension.width; i++) {
+        for (j = 0; j != mDimension.height; j++) {
+          mCouleurs[i][j] = mTableauCouleursCache[mCouleurFond.getRed()][mCouleurFond.getGreen()][mCouleurFond.getBlue()];
+          imageGraphics.setColor(mCouleurs[i][j]);
+          imageGraphics.fillRect(i, j, 1, 1);
+        }
+      }
+    }
+    
+    R = new AtomicInteger(0);
+    G = new AtomicInteger(0);
+    B = new AtomicInteger(0);
     
     lastDrawTime = System.currentTimeMillis();
   }
@@ -160,7 +166,7 @@ public class CPainting extends Canvas implements MouseListener {
 
       for (i = 0; i != mDimension.width; i++) {
         for (j = 0; j != mDimension.height; j++) {
-          mCouleurs[i][j] = new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue());
+          mCouleurs[i][j] = mTableauCouleursCache[mCouleurFond.getRed()][mCouleurFond.getGreen()][mCouleurFond.getBlue()];
         }
       }
     }
@@ -333,16 +339,16 @@ public class CPainting extends Canvas implements MouseListener {
   public void setCouleur(int x, int y, Color c, int pTaille) {
     int i, j, k, l, m, n;
     //float R, G, B, coef;
-    AtomicInteger R,G,B;
-    R = new AtomicInteger(0);
-    G = new AtomicInteger(0);
-    B = new AtomicInteger(0);
+    
+    R.set(0);
+    G.set(0);
+    B.set(0);
+    
     Color lColor, couleur;
 
     long currentDrawTime = System.currentTimeMillis();
     long millisDifference = currentDrawTime - lastDrawTime;
     if(millisDifference > 16) {
-    	//mGraphics.drawImage(bufferedImage, 0, 0, mDimension.width, mDimension.height,this);
     	mGraphics.drawImage(bufferedImage, 0, 0, mDimension.width, mDimension.height,this);
     	lastDrawTime = currentDrawTime;
     }

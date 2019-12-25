@@ -40,6 +40,10 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
   private Long fpsCounter = 0L;
   /** stocke la valeur du compteur lors du dernier timer */
   private Long lastFps = 0L;
+  
+  // Fps indicator
+  private Long nbFps = 0L;
+  private Long fpsSum = 0L;
 
   /****************************************************************************/
   /**
@@ -458,13 +462,12 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
     mPainting.init();
 
     Thread currentThread = Thread.currentThread();
-
-    /*
-     * for ( i=0 ; i<mColonie.size() ; i++ ) {
-     * ((CFourmi)mColonie.elementAt(i)).start(); }
-     */
     
-    mThreadColony.start();
+    //for ( i=0 ; i<mColonie.size() ; i++ ) {
+    //	((CFourmi)mColonie.elementAt(i)).start(); }
+    
+    mColony.start();
+    
 
     while (mApplis == currentThread) {
       if (mPause) {
@@ -501,8 +504,8 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
   public void start() {
     // System.out.println(this.getName()+ ":start()");
     mColony = new CColonie(mColonie, this);
-    mThreadColony = new Thread(mColony);
-    mThreadColony.setPriority(Thread.MAX_PRIORITY);
+    //mThreadColony = new Thread(mColony);
+    //mThreadColony.setPriority(Thread.MAX_PRIORITY);
 
     fpsTimer = new Timer(1000, new ActionListener() {
       @Override
@@ -549,5 +552,12 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
   private synchronized void updateFPS() {
     lastFps = fpsCounter;
     fpsCounter = 0L;
+    fpsSum += lastFps;
+    nbFps++;
+    if(nbFps >= 10L) { 
+    	System.out.println("Moy fps (10s) : " + (fpsSum/nbFps));
+    	fpsSum = 0L;
+    	nbFps = 0L;
+    }
   }
 }

@@ -353,15 +353,15 @@ public class CPainting extends Canvas implements MouseListener {
     	lastDrawTime = currentDrawTime;
     }
     
-    synchronized (mMutexCouleurs) {
-      if (!mSuspendu) {
+    // synchronized (mMutexCouleurs) {
+    //  if (!mSuspendu) {
         // on colorie la case sur laquelle se trouve la fourmi
-        imageGraphics.setColor(c);
-        imageGraphics.fillRect(x, y, 1, 1);
-      }
+    imageGraphics.setColor(c);
+    imageGraphics.fillRect(x, y, 1, 1);
+    //  }
 
       mCouleurs[x][y] = c;
-
+      
       // on fait diffuser la couleur :
       switch (pTaille) {
         case 0:
@@ -430,7 +430,7 @@ public class CPainting extends Canvas implements MouseListener {
       }// end switch
       
     }
-  }
+  //}
 
   
   public void convoluer(AtomicInteger R, AtomicInteger G, AtomicInteger B, int i, int j, int x, int y, int size) {
